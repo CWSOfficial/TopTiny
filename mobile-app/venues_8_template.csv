@@ -1,0 +1,9 @@
+id,name,address,city,state,latitude,longitude,price_level,photo_url,description,is_demo,phone,website,espresso_martini_verified,verification_source,verified_at
+demo_milwaukee_1,Venue 1,"Placeholder address — replace with verified address",Milwaukee,WI,43.0389,-87.9065,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_milwaukee_2,Venue 2,"Placeholder address — replace with verified address",Milwaukee,WI,43.0450,-87.9000,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_chicago_1,Venue 1,"Placeholder address — replace with verified address",Chicago,IL,41.8781,-87.6298,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_chicago_2,Venue 2,"Placeholder address — replace with verified address",Chicago,IL,41.8850,-87.6220,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_phoenix_1,Venue 1,"Placeholder address — replace with verified address",Phoenix,AZ,33.4484,-112.0740,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_phoenix_2,Venue 2,"Placeholder address — replace with verified address",Phoenix,AZ,33.4550,-112.0670,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_austin_1,Venue 1,"Placeholder address — replace with verified address",Austin,TX,30.2672,-97.7431,,,"Demo listing. Replace with verified venue details.",true,,,,,
+demo_austin_2,Venue 2,"Placeholder address — replace with verified address",Austin,TX,30.2740,-97.7360,,,"Demo listing. Replace with verified venue details.",true,,,,,

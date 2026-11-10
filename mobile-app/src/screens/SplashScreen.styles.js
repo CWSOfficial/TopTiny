@@ -1,0 +1,61 @@
+import { StyleSheet } from 'react-native';
+import { colors, radius } from '../styles/theme';
+export default StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.espresso,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30,
+  },
+  topAccent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 5,
+    backgroundColor: colors.gold,
+  },
+  center: { alignItems: 'center', marginTop: -55 },
+  brandIcon: {
+    width: 88,
+    height: 88,
+    borderRadius: 22,
+    marginBottom: 24,
+  },
+  bottom: {
+    position: 'absolute',
+    left: 28,
+    right: 28,
+    bottom: 38,
+    alignItems: 'center',
+  },
+  offlineRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  offlineTitle: { fontSize: 14, color: colors.cream, fontWeight: '700' },
+  offlineBody: {
+    fontSize: 11,
+    lineHeight: 17,
+    color: '#CDBBAA',
+    textAlign: 'center',
+    marginTop: 7,
+  },
+  retry: {
+    height: 44,
+    minWidth: 148,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: '#806451',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 16,
+  },
+  retryText: {
+    fontSize: 9,
+    letterSpacing: 1.5,
+    fontWeight: '800',
+    color: colors.cream,
+  },
+  loading: { fontSize: 8, letterSpacing: 1.8, color: '#CDBBAA', marginTop: 12 },
+});

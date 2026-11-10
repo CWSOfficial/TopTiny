@@ -1,0 +1,30 @@
+# Dependencies and generated build output
+**/node_modules/
+**/dist/
+**/build/
+**/.vite/
+**/.gradle/
+**/.cxx/
+**/Pods/
+**/DerivedData/
+coverage/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+**/ios/.xcode.env.local
+**/android/local.properties
+**/*.keystore
+**/*.jks
+**/*.p8
+**/*.p12
+**/*.mobileprovision
+
+# Local/editor noise
+.DS_Store
+*.log
+.idea/
+.vscode/

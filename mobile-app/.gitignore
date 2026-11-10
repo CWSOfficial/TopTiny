@@ -1,0 +1,14 @@
+node_modules/
+server/node_modules/
+server/.env
+server/data/
+supabase/.temp/
+android/.gradle/
+android/local.properties
+android/app/build/
+android/app/.cxx/
+ios/Pods/
+ios/build/
+.DS_Store
+*.log
+ios/.xcode.env.local

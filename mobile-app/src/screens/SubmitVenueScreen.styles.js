@@ -1,0 +1,9 @@
+import { StyleSheet } from 'react-native';
+import { colors, radius } from '../styles/theme';
+export default StyleSheet.create({
+ screen:{flex:1,backgroundColor:colors.cream},content:{padding:21,paddingBottom:40},back:{flexDirection:'row',alignItems:'center',gap:8,paddingVertical:8},backText:{fontSize:8,color:colors.roast,letterSpacing:1,fontWeight:'800'},
+ heading:{marginTop:21,marginBottom:20},eyebrow:{fontSize:9,color:colors.roast,letterSpacing:2,fontWeight:'800'},title:{fontFamily:'Georgia',fontSize:36,lineHeight:40,color:colors.ink,marginTop:10},subtitle:{fontSize:11,lineHeight:17,color:colors.muted,marginTop:10},
+ card:{padding:17,borderRadius:radius.lg,backgroundColor:colors.paper,borderWidth:1,borderColor:colors.line},label:{fontSize:8,color:colors.roast,letterSpacing:1.3,fontWeight:'800'},optional:{color:colors.muted,fontWeight:'600',letterSpacing:.6},spaced:{marginTop:18},input:{height:44,borderBottomWidth:1,borderBottomColor:colors.line,color:colors.ink,fontSize:13,paddingVertical:8},noteInput:{minHeight:82,padding:12,marginTop:8,borderRadius:13,borderWidth:1,borderColor:colors.line,color:colors.ink,fontSize:12,lineHeight:18},
+ cityGrid:{flexDirection:'row',flexWrap:'wrap',gap:7,marginTop:10},cityChip:{paddingHorizontal:11,paddingVertical:9,borderRadius:radius.pill,borderWidth:1,borderColor:colors.line,backgroundColor:colors.paper},cityChipActive:{backgroundColor:colors.espresso,borderColor:colors.espresso},cityChipText:{fontSize:9,color:colors.roast,fontWeight:'700'},cityChipTextActive:{color:colors.cream},reviewNote:{flexDirection:'row',alignItems:'flex-start',gap:9,padding:12,marginTop:18,marginBottom:17,backgroundColor:'#EEF2EB',borderRadius:13},reviewNoteText:{flex:1,fontSize:10,lineHeight:15,color:colors.green},message:{fontSize:11,lineHeight:16,color:colors.roast,marginBottom:12},
+});
+
