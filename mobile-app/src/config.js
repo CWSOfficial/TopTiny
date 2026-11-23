@@ -1,8 +1,8 @@
 // Add the project's public URL and publishable key from Supabase Settings > API.
 // These are safe for the app only because exposed tables use restrictive RLS.
-export const SUPABASE_URL = 'https://axfiugfdbjyhulizbxhi.supabase.co';
+export const SUPABASE_URL = 'https://rpjiwpzoolraimwgfujr.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY =
-  'sb_publishable_z6znTsKtGc-1PDNwkRHKBg_8DSbGfYM';
+  'sb_publishable_xhNehY62r1V-WnXt3Vrp3g_IPmaXmQI';
 export const isSupabaseConfigured =
   !SUPABASE_URL.includes('YOUR_PROJECT_REF') &&
   !SUPABASE_PUBLISHABLE_KEY.includes('REPLACE_WITH_PROJECT_KEY');

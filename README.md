@@ -27,15 +27,19 @@ npm run dev
 
 Then open `http://localhost:4173/`. The dashboard is built with React JSX and Vite, and uses Supabase browser sign-in with a publishable key. PostgreSQL RLS enforces admin permissions; never add a service-role or secret key to frontend code.
 
-## Supabase deployment steps
+## Supabase status
 
-The app and dashboard are configured for the requested project reference `axfiugfdbjyhulizbxhi`. The current signed-in Supabase browser account does not have permission to open that project, so no database changes or function deployments have been made there from this session.
+The mobile app and dashboard point to the TopTini Supabase project `rpjiwpzoolraimwgfujr`. The live project has the app schema, four city guides, 12 clearly marked demo venues, community rating/submission/favorite/report tables, score and leaderboard views, and profile/review/venue photo buckets. The `admin-users` and `delete-account` Edge Functions are deployed. Client code contains only the publishable key; never add a service-role or secret key to app/admin source.
 
-Before Milestone 2 can be used against the live backend, the project owner must apply `mobile-app/supabase/migrations/20261110190000_milestone_2_community.sql` in the target project’s SQL Editor. Then:
+## Remaining account and release setup
 
-1. Create/sign in to the intended TopTini admin Auth user and grant that exact email `is_admin` using `admin-access-setup.sql`.
-2. Deploy `mobile-app/supabase/functions/delete-account/index.ts` as the `delete-account` Edge Function and `mobile-app/supabase/functions/admin-users/index.ts` as the `admin-users` Edge Function, with JWT verification enabled for both.
-3. Confirm Email and Apple Auth settings and redirect URLs for the actual app bundle ID.
+The requested `admin@yopmail.com` Auth user is not present in the new project yet. Sign it up in the app first, confirm the email if prompted, then run `admin-access-setup.sql` as project owner to enable the admin dashboard for that account. The admin panel requires this `is_admin` profile flag.
+
+Supabase Apple Auth is enabled for the native bundle ID `com.toptini.app`. The app uses Apple's native iOS authentication and exchanges the identity token with Supabase. A real Apple login still needs to be completed with the account holder's Apple ID on a signed iOS device/simulator.
+
+Email/password signups currently require email confirmation. Configure a production SMTP provider in Supabase Auth before opening signup to general users; do not disable email verification as a substitute. The public support email is still a placeholder in the marketing/legal copy and needs the owner's chosen contact address.
+
+The admin panel's local production build succeeds. Deploying the updated Supabase config to Vercel was blocked by Vercel CLI authorization in the current session. Redeploy from the authorized Vercel account before giving testers the production admin URL. The iOS simulator build is being run from Xcode; TestFlight must be uploaded only after the final signed build is accepted.
 
 The Edge Function reads the service-role/secret key only from Supabase’s server-side environment. Never copy that secret into the mobile app or admin panel.
 
