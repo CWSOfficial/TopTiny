@@ -110,7 +110,7 @@ export function UsersPage({ users, page, hasMore, total, busy, error, onRefresh,
       <PageTitle title="Know your community." subtitle="View member accounts and update their TopTini profile details.">
         <button className="button" onClick={onRefresh} disabled={busy}>{busy ? 'Loading…' : <><Icon name="refresh" /> Refresh users</>}</button>
       </PageTitle>
-      {error ? <div className="users-error" role="alert"><strong>User directory unavailable</strong><span>{error}</span><small>Deploy the secure <code>admin-users</code> Supabase Edge Function to enable this page.</small></div> : null}
+      {error ? <div className="users-error" role="alert"><strong>User directory unavailable</strong><span>{error}</span><small>Check the <code>admin-users</code> function response and its Supabase project configuration.</small></div> : null}
       {!error ? <div className="table-card">
         <div className="table-toolbar"><span className="muted-cell">{total === null ? `${users.length} accounts on this page` : `${total} registered accounts`}</span></div>
         <div className="table-scroll"><table className="users-table"><thead><tr><th>MEMBER</th><th>HOME CITY</th><th>JOINED</th><th>LAST SIGN IN</th><th>ACCESS</th><th>ACTIONS</th></tr></thead>

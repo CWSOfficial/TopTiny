@@ -124,9 +124,14 @@ function AdminApp() {
     const { data: result, error } = await supabase.functions.invoke('admin-users', {
       body: { action: 'list', page: requestedPage, perPage: 50 },
     });
+    let responseError = '';
+    if (error?.context instanceof Response) {
+      const responseBody = await error.context.clone().json().catch(() => null);
+      responseError = responseBody?.error || responseBody?.message || '';
+    }
     if (error || result?.error) {
       setUsers([]);
-      setUsersError(result?.error || error?.message || 'The user directory could not be loaded.');
+      setUsersError(result?.error || responseError || error?.message || 'The user directory could not be loaded.');
       setUsersBusy(false);
       return false;
     }
@@ -506,7 +511,7 @@ function AdminApp() {
             <NavItem name="reviews" current={page} onSelect={setPage} icon="reviews" label="Reviews" />
             <NavItem name="reports" current={page} onSelect={setPage} icon="reports" label="Reports" count={data.reports.filter(item => item.status === 'open').length} />
           </nav>
-          <div className="sidebar-bottom"><div className="secure-note"><span className="secure-dot" /><span>Protected by Supabase RLS</span></div><a className="flaticon-attribution" href="https://www.flaticon.com/uicons" target="_blank" rel="noreferrer">Icons by Flaticon</a><button className="signout" onClick={handleSignOut}>Sign out <Icon name="arrow" size={14} /></button></div>
+          <div className="sidebar-bottom"><button className="signout" onClick={handleSignOut}>Sign out <Icon name="arrow" size={14} /></button></div>
         </aside>
         <main className="main-area">
           <header className="topbar"><div><p className="eyebrow">WORKSPACE / {page.toUpperCase()}</p><h2>{pageTitles[page]}</h2></div><div className="topbar-right"><button className="icon-button" aria-label="Refresh dashboard" onClick={page === 'users' ? () => loadUsers(usersPage) : loadData}><Icon name="refresh" size={17} /></button><div className="admin-avatar">{(user.email || 'A').slice(0, 1).toUpperCase()}</div><div className="admin-meta"><strong>{user.email || 'Administrator'}</strong><span>TOPTINI ADMIN</span></div></div></header>

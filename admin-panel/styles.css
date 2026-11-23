@@ -168,10 +168,6 @@ input:focus, select:focus, textarea:focus { border-color: #c39b59; box-shadow: 0
 .nav-item.active { border-color: rgba(217, 190, 145, 0.18); background: linear-gradient(90deg, rgba(196, 159, 103, 0.2), rgba(255, 255, 255, 0.055)); color: #fffaf2; box-shadow: inset 3px 0 #cfad75; }
 .nav-count { min-width: 20px; height: 20px; display: grid; place-items: center; margin-left: auto; padding: 0 5px; border: 1px solid rgba(234, 213, 174, 0.16); border-radius: 20px; background: rgba(195, 155, 89, 0.2); color: #f2dfbd; font-size: 9px; }
 .sidebar-bottom { margin-top: auto; }
-.secure-note { display: flex; align-items: center; gap: 9px; padding: 12px; color: #b5a79d; font-size: 9px; }
-.flaticon-attribution { display: block; width: fit-content; margin: 0 12px 10px; color: #c3a577; font-size: 9px; text-underline-offset: 3px; }
-.flaticon-attribution:hover { color: #f0dfbf; }
-.secure-dot { width: 7px; height: 7px; border-radius: 50%; background: #8caf7b; box-shadow: 0 0 0 4px rgba(140, 175, 123, 0.12); }
 .signout { width: 100%; min-height: 42px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 11px; background: rgba(255, 255, 255, 0.025); color: #ddd1c6; font-size: 10px; transition: background 150ms ease, border-color 150ms ease; }
 .signout:hover { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.075); }
 .main-area { min-width: 0; }
