@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from './supabase.js';
 import { Modal, Toast, pageTitles } from './components.jsx';
+import { BrandLogo, Icon } from './Icon.jsx';
 import MarketingSite from './MarketingSite.jsx';
 import {
   CitiesPage,
@@ -452,14 +453,14 @@ function AdminApp() {
   }
 
   if (!authReady || (user && !adminReady && !loginError)) {
-    return <div className="auth-view"><div className="auth-card loading"><div className="brand-mark">T.</div><p className="eyebrow">TOPTINI · PRIVATE ADMIN</p><h1>Preparing your workspace…</h1></div></div>;
+    return <div className="auth-view"><div className="auth-card loading"><BrandLogo tone="dark" className="login-brand-logo" /><p className="eyebrow">PRIVATE ADMIN</p><h1>Preparing your workspace…</h1></div></div>;
   }
 
   if (!user || !adminReady) {
     return (
       <main className="auth-view">
         <section className="auth-card">
-          <div className="brand-mark">T.</div><p className="eyebrow">TOPTINI · PRIVATE ADMIN</p>
+          <BrandLogo tone="dark" className="login-brand-logo" /><p className="eyebrow">PRIVATE ADMIN</p>
           <h1>Welcome back.</h1>
           <p className="muted">Sign in with your TopTini administrator account to manage the guide and community.</p>
           {loginError ? <p className="login-error" role="alert">{loginError}</p> : null}
@@ -494,21 +495,21 @@ function AdminApp() {
     <>
       <div className="app-shell">
         <aside className="sidebar">
-          <a className="brand-lockup" href="#overview" onClick={event => { event.preventDefault(); setPage('overview'); }}><span className="brand-mark small">T.</span><span>TopTini<small>ADMIN STUDIO</small></span></a>
+          <a className="brand-lockup" href="#overview" onClick={event => { event.preventDefault(); setPage('overview'); }}><BrandLogo className="sidebar-brand-logo" /><span className="sidebar-brand-label">ADMIN STUDIO</span></a>
           <div className="nav-label">WORKSPACE</div>
           <nav>
-            <NavItem name="overview" current={page} onSelect={setPage} icon="◈" label="Overview" />
-            <NavItem name="users" current={page} onSelect={selectPage} icon="♙" label="Users" />
-            <NavItem name="venues" current={page} onSelect={setPage} icon="⌖" label="Venues" />
-            <NavItem name="cities" current={page} onSelect={setPage} icon="◎" label="Cities" />
-            <NavItem name="submissions" current={page} onSelect={setPage} icon="＋" label="Submissions" count={data.submissions.filter(item => item.status === 'pending').length} />
-            <NavItem name="reviews" current={page} onSelect={setPage} icon="☆" label="Reviews" />
-            <NavItem name="reports" current={page} onSelect={setPage} icon="⚑" label="Reports" count={data.reports.filter(item => item.status === 'open').length} />
+            <NavItem name="overview" current={page} onSelect={setPage} icon="dashboard" label="Overview" />
+            <NavItem name="users" current={page} onSelect={selectPage} icon="users" label="Users" />
+            <NavItem name="venues" current={page} onSelect={setPage} icon="venues" label="Venues" />
+            <NavItem name="cities" current={page} onSelect={setPage} icon="cities" label="Cities" />
+            <NavItem name="submissions" current={page} onSelect={setPage} icon="add" label="Submissions" count={data.submissions.filter(item => item.status === 'pending').length} />
+            <NavItem name="reviews" current={page} onSelect={setPage} icon="reviews" label="Reviews" />
+            <NavItem name="reports" current={page} onSelect={setPage} icon="reports" label="Reports" count={data.reports.filter(item => item.status === 'open').length} />
           </nav>
-          <div className="sidebar-bottom"><div className="secure-note"><span className="secure-dot" /><span>Protected by Supabase RLS</span></div><button className="signout" onClick={handleSignOut}>Sign out <span>↗</span></button></div>
+          <div className="sidebar-bottom"><div className="secure-note"><span className="secure-dot" /><span>Protected by Supabase RLS</span></div><a className="flaticon-attribution" href="https://www.flaticon.com/uicons" target="_blank" rel="noreferrer">Icons by Flaticon</a><button className="signout" onClick={handleSignOut}>Sign out <Icon name="arrow" size={14} /></button></div>
         </aside>
         <main className="main-area">
-          <header className="topbar"><div><p className="eyebrow">WORKSPACE / {page.toUpperCase()}</p><h2>{pageTitles[page]}</h2></div><div className="topbar-right"><button className="icon-button" aria-label="Refresh dashboard" onClick={page === 'users' ? () => loadUsers(usersPage) : loadData}>↻</button><div className="admin-avatar">{(user.email || 'A').slice(0, 1).toUpperCase()}</div><div className="admin-meta"><strong>{user.email || 'Administrator'}</strong><span>TOPTINI ADMIN</span></div></div></header>
+          <header className="topbar"><div><p className="eyebrow">WORKSPACE / {page.toUpperCase()}</p><h2>{pageTitles[page]}</h2></div><div className="topbar-right"><button className="icon-button" aria-label="Refresh dashboard" onClick={page === 'users' ? () => loadUsers(usersPage) : loadData}><Icon name="refresh" size={17} /></button><div className="admin-avatar">{(user.email || 'A').slice(0, 1).toUpperCase()}</div><div className="admin-meta"><strong>{user.email || 'Administrator'}</strong><span>TOPTINI ADMIN</span></div></div></header>
           <div className="page-content">{pageContent}</div>
         </main>
       </div>
@@ -523,7 +524,7 @@ function AdminApp() {
 }
 
 function NavItem({ name, current, onSelect, icon, label, count = 0 }) {
-  return <button className={`nav-item ${current === name ? 'active' : ''}`} onClick={() => onSelect(name)}><span>{icon}</span>{label}{count > 0 ? <b className="nav-count">{count}</b> : null}</button>;
+  return <button className={`nav-item ${current === name ? 'active' : ''}`} onClick={() => onSelect(name)}><Icon name={icon} size={16} />{label}{count > 0 ? <b className="nav-count">{count}</b> : null}</button>;
 }
 
 function VenueDialog({ form, cities, photoFile, onChange, onPhoto, onClose, onSubmit }) {

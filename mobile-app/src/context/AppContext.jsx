@@ -7,12 +7,17 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { AppState } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { getCities, getFavorites, getMe, getVenues } from '../api';
 import { CITIES, CITY_META } from '../config';
 import { supabase } from '../supabase/client';
 
 const AppContext = createContext(null);
+const VENUE_CACHE_PREFIX = 'toptini.venue-directory.v1.';
+const VENUE_REFRESH_INTERVAL_MS = 45_000;
+
 export function AppProvider({ children }) {
   const [booting, setBooting] = useState(true);
   const [authReady, setAuthReady] = useState(false);
@@ -21,29 +26,89 @@ export function AppProvider({ children }) {
   const [city, setCity] = useState('Milwaukee');
   const [cities, setCities] = useState(CITIES);
   const [cityMeta, setCityMeta] = useState(CITY_META);
-  const [venues, setVenues] = useState([]);
+  const [venuesByCity, setVenuesByCity] = useState({});
   const [profile, setProfile] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [venueLoading, setVenueLoading] = useState(false);
   const [apiUnavailable, setApiUnavailable] = useState(false);
   const authGeneration = useRef(0);
   const authUserId = useRef(null);
+  const venueCacheRef = useRef({});
+  const venueRequestsRef = useRef(new Map());
+  const activeCityRef = useRef(city);
+  activeCityRef.current = city;
 
-  const loadCoreData = useCallback(async () => {
-    setVenueLoading(true);
-    try {
-      const data = await getVenues(city);
-      setVenues(data);
-      setApiUnavailable(false);
-      return data;
-    } catch (error) {
-      setApiUnavailable(true);
-      setVenues([]);
-      return [];
-    } finally {
-      setVenueLoading(false);
+  const storeVenueDirectory = useCallback((targetCity, data) => {
+    const previous = venueCacheRef.current[targetCity];
+    if (previous && JSON.stringify(previous) === JSON.stringify(data)) return;
+    venueCacheRef.current = { ...venueCacheRef.current, [targetCity]: data };
+    setVenuesByCity(current => ({ ...current, [targetCity]: data }));
+    AsyncStorage.setItem(
+      `${VENUE_CACHE_PREFIX}${targetCity}`,
+      JSON.stringify(data),
+    ).catch(() => {});
+  }, []);
+
+  const loadCoreData = useCallback((targetCity = city) => {
+    const inFlight = venueRequestsRef.current.get(targetCity);
+    if (inFlight) return inFlight;
+    if (activeCityRef.current === targetCity && !venueCacheRef.current[targetCity]) {
+      setVenueLoading(true);
     }
-  }, [city]);
+
+    const request = (async () => {
+      let cached = venueCacheRef.current[targetCity];
+      if (!cached) {
+        try {
+          const saved = await AsyncStorage.getItem(
+            `${VENUE_CACHE_PREFIX}${targetCity}`,
+          );
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              cached = parsed;
+              venueCacheRef.current = {
+                ...venueCacheRef.current,
+                [targetCity]: parsed,
+              };
+              setVenuesByCity(current => ({ ...current, [targetCity]: parsed }));
+            }
+          }
+        } catch {
+          // Ignore an invalid or unavailable cache and fetch fresh data below.
+        }
+      }
+
+      const isCurrentCity = () => activeCityRef.current === targetCity;
+      if (isCurrentCity()) {
+        // Only show the initial loader when there is no saved list to keep visible.
+        setVenueLoading(!cached);
+        if (cached) setApiUnavailable(false);
+      }
+      try {
+        const data = await getVenues(targetCity);
+        storeVenueDirectory(targetCity, data);
+        if (isCurrentCity()) setApiUnavailable(false);
+        return data;
+      } catch {
+        // Keep showing the last known list when the network request fails.
+        if (isCurrentCity()) setApiUnavailable(true);
+        return cached || [];
+      } finally {
+        if (isCurrentCity()) setVenueLoading(false);
+      }
+    })();
+
+    venueRequestsRef.current.set(targetCity, request);
+    request.finally(() => {
+      if (venueRequestsRef.current.get(targetCity) === request) {
+        venueRequestsRef.current.delete(targetCity);
+      }
+    }).catch(() => {});
+    return request;
+  }, [city, storeVenueDirectory]);
+
+  const venues = venuesByCity[city] || [];
 
   const loadFavorites = useCallback(async () => {
     if (!session?.user || !online) {
@@ -56,6 +121,11 @@ export function AppProvider({ children }) {
       setFavorites([]);
     }
   }, [online, session]);
+
+  const setCurrentCityVenues = useCallback(
+    data => storeVenueDirectory(city, data),
+    [city, storeVenueDirectory],
+  );
 
   useEffect(() => {
     const applyConnectivity = state => {
@@ -149,10 +219,45 @@ export function AppProvider({ children }) {
       loadCoreData();
       loadFavorites();
     } else {
-      setVenues([]);
       setFavorites([]);
     }
   }, [city, online, session, loadCoreData, loadFavorites]);
+
+  useEffect(() => {
+    if (!online || !session?.user) return undefined;
+
+    let active = true;
+    const refreshQuietly = () => {
+      if (active && AppState.currentState === 'active') loadCoreData(city);
+    };
+    const appStateSubscription = AppState.addEventListener('change', state => {
+      if (state === 'active') refreshQuietly();
+    });
+    const refreshTimer = setInterval(
+      refreshQuietly,
+      VENUE_REFRESH_INTERVAL_MS,
+    );
+    const channel = supabase
+      .channel(`venue-directory-${city}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'venues',
+          filter: `city=eq.${city}`,
+        },
+        refreshQuietly,
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      appStateSubscription.remove();
+      clearInterval(refreshTimer);
+      supabase.removeChannel(channel);
+    };
+  }, [city, online, session?.user?.id, loadCoreData]);
 
   const value = useMemo(
     () => ({
@@ -165,7 +270,7 @@ export function AppProvider({ children }) {
       cities,
       cityMeta,
       venues,
-      setVenues,
+      setVenues: setCurrentCityVenues,
       profile,
       setProfile,
       favorites,
@@ -190,6 +295,7 @@ export function AppProvider({ children }) {
       venueLoading,
       apiUnavailable,
       loadCoreData,
+      setCurrentCityVenues,
       loadFavorites,
     ],
   );

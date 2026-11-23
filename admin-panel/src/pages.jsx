@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EmptyState, PageTitle, StatCard, StatusPill, VenueThumb } from './components.jsx';
 import { supabase } from './supabase.js';
+import { Icon } from './Icon.jsx';
 
 const number = value => Number(value || 0);
 const dateText = value => value ? new Date(value).toLocaleDateString() : '—';
@@ -14,20 +15,20 @@ export function OverviewPage({ user, venues, cities, submissions, reviews, repor
       <PageTitle title={`Good evening, ${(user?.email || 'admin').split('@')[0]}.`} subtitle="Your TopTini community is in good hands.">
         <button className="button" onClick={() => onNavigate('users')}>Manage users</button>
         <button className="button" onClick={() => onNavigate('venues')}>Manage venues</button>
-        <button className="button primary" onClick={onAddVenue}>＋ Add venue</button>
+        <button className="button primary" onClick={onAddVenue}><Icon name="add" /> Add venue</button>
       </PageTitle>
       <div className="stats-grid">
-        <StatCard label="VENUES" value={venues.length} note={`${venues.filter(item => item.is_demo).length} demo placeholders`} icon="⌖" />
-        <StatCard label="PUBLISHED REVIEWS" value={reviews.filter(item => item.status === 'published').length} note="Across all city guides" icon="☆" />
-        <StatCard label="PENDING SUBMISSIONS" value={pending.length} note="Awaiting venue verification" icon="＋" />
-        <StatCard label="OPEN REPORTS" value={openReports.length} note="Needs a moderation decision" icon="⚑" />
+        <StatCard label="VENUES" value={venues.length} note={`${venues.filter(item => item.is_demo).length} demo placeholders`} icon="venues" />
+        <StatCard label="PUBLISHED REVIEWS" value={reviews.filter(item => item.status === 'published').length} note="Across all city guides" icon="reviews" />
+        <StatCard label="PENDING SUBMISSIONS" value={pending.length} note="Awaiting venue verification" icon="add" />
+        <StatCard label="OPEN REPORTS" value={openReports.length} note="Needs a moderation decision" icon="reports" />
       </div>
       <div className="overview-grid">
         <section className="panel-card">
-          <div className="panel-head"><div><h3>Recent community ratings</h3><p>The latest ratings and written reviews</p></div><button className="text-link" onClick={() => onNavigate('reviews')}>View all →</button></div>
+          <div className="panel-head"><div><h3>Recent community ratings</h3><p>The latest ratings and written reviews</p></div><button className="text-link" onClick={() => onNavigate('reviews')}>View all <Icon name="arrow" size={12} /></button></div>
           {recent.length ? recent.map(review => (
             <div className="mini-row" key={review.id}>
-              <div className="mini-avatar" style={{ display: 'grid', placeItems: 'center', color: '#704735' }}>☆</div>
+              <div className="mini-avatar"><Icon name="reviews" size={16} /></div>
               <div className="mini-info"><strong>{review.venue?.name || 'Venue review'}</strong><span>{review.author_name} · {number(review.rating).toFixed(1)} · {dateText(review.created_at)}</span></div>
               <StatusPill value={review.status} />
             </div>
@@ -35,9 +36,9 @@ export function OverviewPage({ user, venues, cities, submissions, reviews, repor
         </section>
         <section className="panel-card">
           <div className="panel-head"><div><h3>Needs your attention</h3><p>Keep the city guides accurate and welcoming</p></div></div>
-          <AttentionRow icon="＋" title={`${pending.length} venue suggestions`} subtitle="Confirm location and menu evidence before approval" action="Review" onClick={() => onNavigate('submissions')} />
-          <AttentionRow icon="⚑" title={`${openReports.length} open content reports`} subtitle="Review photos and community content" action="Review" onClick={() => onNavigate('reports')} />
-          <AttentionRow icon="◎" title={`${cities.filter(city => city.is_active).length} active cities`} subtitle="Manage coverage and map centers" action="Manage" onClick={() => onNavigate('cities')} />
+          <AttentionRow icon="add" title={`${pending.length} venue suggestions`} subtitle="Confirm location and menu evidence before approval" action="Review" onClick={() => onNavigate('submissions')} />
+          <AttentionRow icon="reports" title={`${openReports.length} open content reports`} subtitle="Review photos and community content" action="Review" onClick={() => onNavigate('reports')} />
+          <AttentionRow icon="cities" title={`${cities.filter(city => city.is_active).length} active cities`} subtitle="Manage coverage and map centers" action="Manage" onClick={() => onNavigate('cities')} />
         </section>
       </div>
     </>
@@ -45,7 +46,7 @@ export function OverviewPage({ user, venues, cities, submissions, reviews, repor
 }
 
 function AttentionRow({ icon, title, subtitle, action, onClick }) {
-  return <div className="mini-row"><div className="stat-icon">{icon}</div><div className="mini-info"><strong>{title}</strong><span>{subtitle}</span></div><button className="text-link" onClick={onClick}>{action}</button></div>;
+  return <div className="mini-row"><div className="stat-icon"><Icon name={icon} /></div><div className="mini-info"><strong>{title}</strong><span>{subtitle}</span></div><button className="text-link" onClick={onClick}>{action}</button></div>;
 }
 
 export function VenuesPage({ venues, cities, onAdd, onEdit, onDelete, onImport }) {
@@ -55,7 +56,7 @@ export function VenuesPage({ venues, cities, onAdd, onEdit, onDelete, onImport }
   return (
     <>
       <PageTitle title="Every great pour starts here." subtitle="Add and maintain accurate venue details across the city guide.">
-        <button className="button" onClick={onImport}>Import CSV</button><button className="button primary" onClick={onAdd}>＋ Add venue</button>
+        <button className="button" onClick={onImport}><Icon name="import" /> Import CSV</button><button className="button primary" onClick={onAdd}><Icon name="add" /> Add venue</button>
       </PageTitle>
       <div className="table-card">
         <div className="table-toolbar">
@@ -73,7 +74,7 @@ export function VenuesPage({ venues, cities, onAdd, onEdit, onDelete, onImport }
               <td><strong>{venue.review_count ? number(venue.average_score).toFixed(1) : '—'}</strong><span className="muted-cell"> · {venue.review_count || 0}</span></td>
               <td><StatusPill value={venue.espresso_martini_verified ? 'verified' : 'needs proof'} /></td>
               <td><StatusPill value={venue.is_demo ? 'demo' : 'live'} /></td>
-              <td><div className="table-actions"><button className="table-action" onClick={() => onEdit(venue)}>Edit</button><button className="table-action danger" onClick={() => onDelete(venue)}>Remove</button></div></td>
+              <td><div className="table-actions"><button className="table-action" onClick={() => onEdit(venue)}><Icon name="edit" size={12} /> Edit</button><button className="table-action danger" onClick={() => onDelete(venue)}><Icon name="trash" size={12} /> Remove</button></div></td>
             </tr>
           )) : <tr><td className="empty-cell" colSpan="6">No venues match your search.</td></tr>}</tbody>
         </table></div>
@@ -86,7 +87,7 @@ export function CitiesPage({ cities, venues, submissions, onAdd, onEdit, onToggl
   return (
     <>
       <PageTitle title="Build city by city." subtitle="City centers drive discovery maps, user preferences and venue suggestions.">
-        <button className="button primary" onClick={onAdd}>＋ Add city</button>
+        <button className="button primary" onClick={onAdd}><Icon name="add" /> Add city</button>
       </PageTitle>
       <div className="city-grid">{cities.length ? cities.map(city => {
         const venueCount = venues.filter(venue => venue.city === city.name).length;
@@ -107,7 +108,7 @@ export function UsersPage({ users, page, hasMore, total, busy, error, onRefresh,
   return (
     <>
       <PageTitle title="Know your community." subtitle="View member accounts and update their TopTini profile details.">
-        <button className="button" onClick={onRefresh} disabled={busy}>{busy ? 'Loading…' : '↻ Refresh users'}</button>
+        <button className="button" onClick={onRefresh} disabled={busy}>{busy ? 'Loading…' : <><Icon name="refresh" /> Refresh users</>}</button>
       </PageTitle>
       {error ? <div className="users-error" role="alert"><strong>User directory unavailable</strong><span>{error}</span><small>Deploy the secure <code>admin-users</code> Supabase Edge Function to enable this page.</small></div> : null}
       {!error ? <div className="table-card">
@@ -145,7 +146,7 @@ function SubmissionCard({ item, city, onApprove, onReject }) {
   const update = event => setFields(current => ({ ...current, [event.target.name]: event.target.value }));
   return (
     <article className="submission-card">
-      <div className="submission-head"><div className="stat-icon">⌖</div><div className="submission-main"><h3>{item.name}</h3><p>{item.address} · {item.city}, {item.state}</p><p>Suggested {dateText(item.created_at)}{item.phone ? ` · ${item.phone}` : ''}{item.website ? <> · <a href={item.website} target="_blank" rel="noreferrer">website</a></> : null}</p>{item.note ? <div className="review-copy">{item.note}</div> : null}</div><StatusPill value={item.status} /></div>
+      <div className="submission-head"><div className="stat-icon"><Icon name="venues" /></div><div className="submission-main"><h3>{item.name}</h3><p>{item.address} · {item.city}, {item.state}</p><p>Suggested {dateText(item.created_at)}{item.phone ? ` · ${item.phone}` : ''}{item.website ? <> · <a href={item.website} target="_blank" rel="noreferrer">website</a></> : null}</p>{item.note ? <div className="review-copy">{item.note}</div> : null}</div><StatusPill value={item.status} /></div>
       <div className="submission-fields">
         <label>Verified latitude<input name="latitude" type="number" step="any" min="-90" max="90" value={fields.latitude} placeholder={number(city?.latitude).toFixed(4)} onChange={update} /></label>
         <label>Verified longitude<input name="longitude" type="number" step="any" min="-180" max="180" value={fields.longitude} placeholder={number(city?.longitude).toFixed(4)} onChange={update} /></label>
@@ -163,7 +164,7 @@ export function ReviewsPage({ reviews, onModerate, onDelete }) {
       <PageTitle title="Community, with care." subtitle="Review written content and drink photos. Hidden reviews stop contributing to venue scores."><StatusPill value={`${reviews.length} reviews`} /></PageTitle>
       <div className="review-list">{reviews.length ? reviews.map(review => (
         <article className="review-card" key={review.id}>
-          <div className="review-head"><div className="stat-icon">☆</div><div className="review-main"><h3>{review.venue?.name || 'Venue'} · {number(review.rating).toFixed(1)}</h3><p>{review.author_name} · {review.venue?.city || ''} · {dateText(review.created_at)}</p></div><StatusPill value={review.status} /></div>
+          <div className="review-head"><div className="stat-icon"><Icon name="reviews" /></div><div className="review-main"><h3>{review.venue?.name || 'Venue'} · {number(review.rating).toFixed(1)}</h3><p>{review.author_name} · {review.venue?.city || ''} · {dateText(review.created_at)}</p></div><StatusPill value={review.status} /></div>
           {review.body ? <div className="review-copy">{review.body}</div> : null}
           {review.photo_path ? <a href={reviewPhotoUrl(review.photo_path)} target="_blank" rel="noreferrer"><img className="venue-thumb review-photo-thumb" src={reviewPhotoUrl(review.photo_path)} alt="Review" /></a> : null}
           <div className="report-actions">{review.status === 'published' ? <button className="table-action danger" onClick={() => onModerate(review, 'hidden')}>Hide from guide</button> : <button className="table-action" onClick={() => onModerate(review, 'published')}>Restore review</button>}<button className="table-action danger" onClick={() => onDelete(review)}>Delete</button></div>
@@ -182,7 +183,7 @@ export function ReportsPage({ reports, onDismiss, onHideReview }) {
         const review = report.review || {};
         return (
           <article className="review-card" key={report.id}>
-            <div className="review-head"><div className="stat-icon">⚑</div><div className="review-main"><h3>{review.venue?.name || 'Reported review'}</h3><p>Reason: {(report.reason || '').replaceAll('_', ' ')} · Reported {dateText(report.created_at)}</p></div><StatusPill value={report.status} /></div>
+            <div className="review-head"><div className="stat-icon"><Icon name="reports" /></div><div className="review-main"><h3>{review.venue?.name || 'Reported review'}</h3><p>Reason: {(report.reason || '').replaceAll('_', ' ')} · Reported {dateText(report.created_at)}</p></div><StatusPill value={report.status} /></div>
             {review.body ? <div className="review-copy">{review.body}</div> : null}{report.details ? <div className="report-review">{report.details}</div> : null}
             <div className="report-actions">{review.id && review.status === 'published' ? <button className="table-action danger" onClick={() => onHideReview(report, review)}>Hide review & resolve</button> : null}{report.status === 'open' ? <button className="table-action" onClick={() => onDismiss(report)}>Dismiss report</button> : null}</div>
           </article>

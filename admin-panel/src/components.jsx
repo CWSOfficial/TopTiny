@@ -1,5 +1,6 @@
 import React from 'react';
 import { supabase } from './supabase.js';
+import { Icon } from './Icon.jsx';
 
 export const pageTitles = {
   overview: 'Overview',
@@ -27,7 +28,7 @@ export function EmptyState({ title, message }) {
 export function StatCard({ label, value, note, icon }) {
   return (
     <article className="stat-card">
-      <div className="stat-top"><span>{label}</span><span className="stat-icon">{icon}</span></div>
+      <div className="stat-top"><span>{label}</span><span className="stat-icon"><Icon name={icon} /></span></div>
       <div className="stat-value">{value}</div>
       <div className="stat-foot">{note}</div>
     </article>
@@ -57,7 +58,7 @@ export function Modal({ title, eyebrow, onClose, children, wide = false }) {
       <section className={`dialog ${wide ? 'dialog-wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
         <div className="dialog-head">
           <div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div>
-          <button type="button" className="dialog-close" aria-label="Close dialog" onClick={onClose}>×</button>
+          <button type="button" className="dialog-close" aria-label="Close dialog" onClick={onClose}><Icon name="close" /></button>
         </div>
         {children}
       </section>

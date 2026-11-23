@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'TopTiniFlaticon';
+  src: url('/fonts/uicons-regular-rounded.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   font-family: 'DM Sans', sans-serif;
   color: #211611;
@@ -64,6 +72,8 @@ button:disabled { cursor: wait; opacity: 0.6; }
   box-shadow: 0 8px 20px rgba(48, 32, 27, 0.2);
 }
 .brand-mark.small { width: 42px; height: 42px; border-radius: 14px; font-size: 24px; }
+.flaticon-icon { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; font-family: 'TopTiniFlaticon'; font-style: normal; font-weight: 400; line-height: 1; }
+.login-brand-logo { display: block; width: 142px; height: auto; margin: 0 0 20px; object-fit: contain; object-position: left center; }
 .eyebrow {
   margin: 0 0 9px;
   color: var(--roast);
@@ -94,6 +104,10 @@ input:focus, select:focus, textarea:focus { border-color: #c39b59; box-shadow: 0
 .auth-legal-links a { color: #79533a; text-decoration: underline; text-underline-offset: 3px; }
 .auth-legal-links a:hover { color: #a36e43; }
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: 41px;
   padding: 0 16px;
   border: 1px solid #e6ded2;
@@ -127,8 +141,9 @@ input:focus, select:focus, textarea:focus { border-color: #c39b59; box-shadow: 0
     linear-gradient(180deg, #30201b 0%, #291b17 100%);
   color: var(--cream);
 }
-.brand-lockup { display: flex; align-items: center; gap: 12px; padding: 0 8px 38px; color: var(--cream); text-decoration: none; font: 600 21px 'Playfair Display', serif; letter-spacing: -0.3px; }
-.brand-lockup small { display: block; margin-top: 4px; color: #c3a577; font: 700 8px 'DM Sans', sans-serif; letter-spacing: 1.9px; }
+.brand-lockup { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 0 8px 34px; color: var(--cream); text-decoration: none; }
+.sidebar-brand-logo { display: block; width: 128px; height: 56px; object-fit: contain; object-position: left center; }
+.sidebar-brand-label { color: #c3a577; font: 700 8px 'DM Sans', sans-serif; letter-spacing: 1.9px; }
 .nav-label { padding: 0 13px 11px; color: #a99588; font-size: 8px; font-weight: 700; letter-spacing: 1.8px; }
 .sidebar nav { display: grid; gap: 5px; }
 .nav-item {
@@ -148,11 +163,14 @@ input:focus, select:focus, textarea:focus { border-color: #c39b59; box-shadow: 0
   transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
 }
 .nav-item > span { width: 20px; color: #cfad75; text-align: center; font-size: 16px; }
+.nav-item > .flaticon-icon { width: 20px; }
 .nav-item:hover { background: rgba(255, 255, 255, 0.055); color: white; }
 .nav-item.active { border-color: rgba(217, 190, 145, 0.18); background: linear-gradient(90deg, rgba(196, 159, 103, 0.2), rgba(255, 255, 255, 0.055)); color: #fffaf2; box-shadow: inset 3px 0 #cfad75; }
 .nav-count { min-width: 20px; height: 20px; display: grid; place-items: center; margin-left: auto; padding: 0 5px; border: 1px solid rgba(234, 213, 174, 0.16); border-radius: 20px; background: rgba(195, 155, 89, 0.2); color: #f2dfbd; font-size: 9px; }
 .sidebar-bottom { margin-top: auto; }
 .secure-note { display: flex; align-items: center; gap: 9px; padding: 12px; color: #b5a79d; font-size: 9px; }
+.flaticon-attribution { display: block; width: fit-content; margin: 0 12px 10px; color: #c3a577; font-size: 9px; text-underline-offset: 3px; }
+.flaticon-attribution:hover { color: #f0dfbf; }
 .secure-dot { width: 7px; height: 7px; border-radius: 50%; background: #8caf7b; box-shadow: 0 0 0 4px rgba(140, 175, 123, 0.12); }
 .signout { width: 100%; min-height: 42px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 11px; background: rgba(255, 255, 255, 0.025); color: #ddd1c6; font-size: 10px; transition: background 150ms ease, border-color 150ms ease; }
 .signout:hover { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.075); }
@@ -200,6 +218,7 @@ input:focus, select:focus, textarea:focus { border-color: #c39b59; box-shadow: 0
 .panel-head h3 { margin: 0; color: var(--ink); font: 600 17px 'Playfair Display', serif; }
 .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
 .text-link { border: 0; background: none; color: var(--roast); font-size: 10px; font-weight: 700; white-space: nowrap; }
+.text-link { display: inline-flex; align-items: center; gap: 5px; }
 .text-link:hover { color: #a06e35; }
 .mini-row { display: flex; align-items: center; gap: 11px; padding: 13px 0; border-top: 1px solid #f0eae1; }
 .mini-avatar { width: 37px; height: 37px; display: grid; flex: 0 0 auto; place-items: center; border: 1px solid #ede2d0; border-radius: 12px; background: #f8f1e5; color: var(--roast); }
