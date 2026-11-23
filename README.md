@@ -39,7 +39,7 @@ Supabase Apple Auth is enabled for the native bundle ID `com.toptini.app`. The a
 
 Email/password signups currently require email confirmation. Configure a production SMTP provider in Supabase Auth before opening signup to general users; do not disable email verification as a substitute. The public support email is still a placeholder in the marketing/legal copy and needs the owner's chosen contact address.
 
-The admin panel's local production build succeeds. Deploying the updated Supabase config to Vercel was blocked by Vercel CLI authorization in the current session. Redeploy from the authorized Vercel account before giving testers the production admin URL. The iOS simulator build is being run from Xcode; TestFlight must be uploaded only after the final signed build is accepted.
+The admin panel's local production build succeeds and it is running at `http://127.0.0.1:4173/`; the iOS app also builds and launches on the iPhone Air simulator. The updated Supabase config could not be pushed to GitHub because the active GitHub identity lacks write permission, and the Vercel deployment was rejected as unauthorized. Push/deploy from an account with access before using the production admin URL or uploading a new TestFlight build.
 
 The Edge Function reads the service-role/secret key only from Supabase’s server-side environment. Never copy that secret into the mobile app or admin panel.
 

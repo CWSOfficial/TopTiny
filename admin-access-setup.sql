@@ -1,8 +1,8 @@
 -- Run only in the TopTini Supabase SQL Editor as the project owner.
--- Replace the email below with the exact Supabase Auth account that should administer the app.
+-- Run after admin@yopmail.com has signed up in the new TopTini Supabase project.
 do $$
 declare
-  admin_email text := 'REPLACE_WITH_ADMIN_EMAIL';
+  admin_email text := 'admin@yopmail.com';
 begin
   insert into public.profiles (id, username, preferred_city)
   select
