@@ -6,30 +6,41 @@ import styles from './VenueCard.styles';
 
 const fallbackPhoto =
   'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1200&q=85';
-export default function VenueCard({ venue, onPress }) {
+export default function VenueCard({ venue, onPress, onRatePress }) {
   return (
-    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.card}>
-      <ImageBackground
-        source={{ uri: venue.photoUrl || fallbackPhoto }}
-        imageStyle={styles.photoImage}
-        style={styles.photo}
-      >
-        <View style={styles.photoShade} />
-        <View style={styles.photoTop}>
-          <View style={styles.newBadge}>
-            <Text style={styles.newBadgeText}>
-              {venue.isDemo ? 'DEMO VENUE' : venue.espressoMartiniVerified ? 'MENU VERIFIED' : 'TOPTINI GUIDE'}
+    <View style={styles.card}>
+      <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
+        <ImageBackground
+          source={{ uri: venue.photoUrl || fallbackPhoto }}
+          imageStyle={styles.photoImage}
+          style={styles.photo}
+        >
+          <View style={styles.photoShade} />
+          <View style={styles.photoTop}>
+            <View style={styles.newBadge}>
+              <Text style={styles.newBadgeText}>
+                {venue.isDemo ? 'DEMO VENUE' : venue.espressoMartiniVerified ? 'MENU VERIFIED' : 'TOPTINI GUIDE'}
+              </Text>
+            </View>
+            <View style={styles.scoreBadge}>
+              <View style={styles.scoreValueRow}>
+                <AppIcon name="star" size={14} color={colors.gold} />
+                <Text style={styles.scoreValue}>
+                  {venue.reviewCount ? Number(venue.averageScore).toFixed(1) : '—'}
+                </Text>
+                <Text style={styles.scoreScale}>/10</Text>
+              </View>
+              <Text style={styles.scoreLabel}>TOPTINI SCORE</Text>
+            </View>
+          </View>
+          <View style={styles.photoText}>
+            <Text style={styles.category}>ESPRESSO MARTINI</Text>
+            <Text numberOfLines={1} style={styles.name}>
+              {venue.name}
             </Text>
           </View>
-          <AppIcon name="arrow-up-right" size={17} color={colors.cream} />
-        </View>
-        <View style={styles.photoText}>
-          <Text style={styles.category}>ESPRESSO MARTINI</Text>
-          <Text numberOfLines={1} style={styles.name}>
-            {venue.name}
-          </Text>
-        </View>
-      </ImageBackground>
+        </ImageBackground>
+      </TouchableOpacity>
       <View style={styles.meta}>
         <View style={styles.placeIcon}>
           <AppIcon name="map-pin" size={13} color={colors.roast} />
@@ -53,8 +64,16 @@ export default function VenueCard({ venue, onPress }) {
             {venue.priceLevel ? `  ·  ${'$'.repeat(venue.priceLevel)}` : ''}
           </Text>
         </View>
-        <AppIcon name="chevron-right" size={18} color={colors.muted} />
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={`Rate ${venue.name}`}
+          onPress={onRatePress}
+          style={styles.rateButton}
+        >
+          <AppIcon name="star" size={13} color={colors.cream} />
+          <Text style={styles.rateButtonText}>RATE IT</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }

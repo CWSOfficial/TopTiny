@@ -35,9 +35,9 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>TopTini uses your location to show nearby espresso martini venues.</string>
+	<string>TopTini uses your location only when you choose Nearby, to sort nearby espresso martini venues and center the map.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>TopTini uses your location while you use the app to show nearby espresso martini venues and center the map on your current area.</string>
+	<string>TopTini uses your location only when you choose Nearby, to sort nearby espresso martini venues and center the map. TopTini does not track your location in the background.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>TopTini lets you choose a profile photo and attach drink photos to your venue ratings and reviews.</string>
 	<key>UILaunchStoryboardName</key>

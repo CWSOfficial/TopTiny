@@ -68,7 +68,7 @@ export default function ProfileScreen({ navigation }) {
     return () => { active = false; };
   }, [profile?.id]);
   async function changePhoto() {
-    if (!profile) return navigation.navigate('Auth');
+    if (!profile) return navigation.navigate('Login');
     const result = await launchImageLibrary({
       mediaType: 'photo',
       selectionLimit: 1,
@@ -98,7 +98,7 @@ export default function ProfileScreen({ navigation }) {
     }
   }
   async function save() {
-    if (!profile) return navigation.navigate('Auth');
+    if (!profile) return navigation.navigate('Login');
     if (username.trim().length < 2)
       return setMessage('Please choose a name with at least 2 characters.');
     setSaving(true);
@@ -302,7 +302,7 @@ export default function ProfileScreen({ navigation }) {
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
-          onPress={() => navigation.navigate('Auth')}
+          onPress={() => navigation.navigate('Login')}
           style={styles.signOut}
         >
           <Text style={styles.signOutText}>SIGN IN OR CREATE ACCOUNT</Text>

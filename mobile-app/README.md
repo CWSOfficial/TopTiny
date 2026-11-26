@@ -18,7 +18,7 @@ There are no `.ts` or `.tsx` source files.
 
 1. Install Node.js 20.19 or later, Android Studio and/or Xcode, and the React Native CLI prerequisites for your host OS.
 2. Run `npm install` in this directory.
-3. The app is configured for project reference `axfiugfdbjyhulizbxhi`. The Milestone 2 migration is present at `supabase/migrations/20261110190000_milestone_2_community.sql`; the current signed-in dashboard account could not access this project, so database deployment still needs the project owner.
+3. The source currently points to the earlier Supabase project `rpjiwpzoolraimwgfujr` in `src/config.js`. The requested client project is `axfiugfdbjyhulizbxhi`, but the signed-in Supabase account could not access it. This source is not yet connected to the client-owned backend; do not release it as the client handover build.
 4. `src/config.js` is configured with the project URL and **publishable key**. Never place a service-role or secret key in the app.
 5. Confirm Email and Apple providers, confirmation templates, and allowed redirects in the target project's Auth settings. The bundle identifier in the iOS project is `com.toptini.app`.
 6. The app's seed data defines 12 clearly marked demo listings: Venue 1–6 in Milwaukee, and Venue 1–2 in Chicago, Phoenix, and Austin. Replace these with client-approved, verified venue data before public launch.
@@ -30,13 +30,13 @@ The native CLI Android and iOS project shells are included. Android Maps needs a
 ## Release configuration to verify
 
 - The app includes 12 clearly marked demo placeholders. Replace them with the client’s real venue records before public launch; do not present placeholder addresses as real locations.
-- Confirm production email delivery, confirmation templates, allowed redirect URLs, and Apple provider settings in the requested Supabase project after access is available.
-- An earlier TestFlight upload was reported in the project conversation. The current App Store Connect processing/availability status and whether the latest M2 build has been signed are not verified by this source folder.
+- Confirm production email delivery, confirmation templates, allowed redirect URLs, and Apple provider settings in the client’s Supabase project after access is available.
+- TestFlight currently has build 6 (1.0) marked Ready to Submit. Build 7 is only built and running in the simulator; it has not been archived or uploaded.
 - Configure the Android Maps key locally. The iOS bundle identifier is `com.toptini.app` and must match the Apple Developer App ID and Supabase Apple provider configuration.
 
 ## API
 
-Supabase Auth owns password and Apple identity authentication. Supabase Postgres stores profiles, venues, and community activity. The client app uses only the public publishable key; RLS is the database security boundary. The current account could not access the target project, so its provider configuration, signing and current distribution status still need owner-side verification.
+Supabase Auth owns password and Apple identity authentication. Supabase Postgres stores profiles, venues, and community activity. The client app uses only the public publishable key; RLS is the database security boundary. The app and admin panel still reference `rpjiwpzoolraimwgfujr`; the client-specified `axfiugfdbjyhulizbxhi` project requires access and its publishable key before the release configuration can be switched.
 
 Supabase is the app backend. A legacy Express/SQLite directory may exist outside this project folder; it is not called by this app.
 

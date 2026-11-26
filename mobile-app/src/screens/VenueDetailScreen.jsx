@@ -1,19 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Image,
   ImageBackground,
   Linking,
+  Modal,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Share from 'react-native-share';
+import ViewShot from 'react-native-view-shot';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AppIcon from '../components/AppIcon';
 import PrimaryButton from '../components/PrimaryButton';
+import TopTiniLogo from '../components/TopTiniLogo';
 import { deleteReview, getMyVenueReview, getVenueReviews, reportReview, saveVenueReview, setFavorite } from '../api';
 import { useApp } from '../context/AppContext';
 import { colors } from '../styles/theme';
@@ -35,7 +39,19 @@ export default function VenueDetailScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [favoriteBusy, setFavoriteBusy] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const scrollRef = useRef(null);
+  const shareCardRef = useRef(null);
+  const [reviewOffset, setReviewOffset] = useState(0);
+
+  useEffect(() => {
+    if (route.params?.focusReview && reviewOffset > 0) {
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({ y: Math.max(0, reviewOffset - 16), animated: true });
+      });
+    }
+  }, [route.params?.focusReview, reviewOffset]);
 
   const loadCommunity = useCallback(async () => {
     setLoading(true);
@@ -63,6 +79,9 @@ export default function VenueDetailScreen({ route, navigation }) {
   useEffect(() => { loadCommunity(); }, [loadCommunity]);
 
   async function toggleFavorite() {
+    if (!session?.user) {
+      return navigation.navigate('Login', { notice: 'Sign in to save this venue to your places.' });
+    }
     setFavoriteBusy(true);
     setMessage('');
     try {
@@ -136,8 +155,27 @@ export default function VenueDetailScreen({ route, navigation }) {
     Linking.openURL('https://maps.google.com/?q=' + query).catch(() => setMessage('Directions could not be opened.'));
   }
 
+  async function shareVenueCard() {
+    try {
+      const uri = await shareCardRef.current?.capture?.();
+      if (!uri) throw new Error('The share image could not be created. Please try again.');
+      await Share.open({
+        url: uri.startsWith('file://') ? uri : `file://${uri}`,
+        type: 'image/png',
+        title: `TopTini · ${venue.name}`,
+        failOnCancel: false,
+      });
+      setShareOpen(false);
+    } catch (error) {
+      if (error?.message && !/cancel/i.test(error.message)) {
+        setMessage(error.message || 'The share sheet could not be opened.');
+      }
+    }
+  }
+
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+    <>
+    <ScrollView ref={scrollRef} style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
       <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.back}>
         <AppIcon name="arrow-left" size={17} color={colors.roast} />
         <Text style={styles.backText}>BACK TO DISCOVERY</Text>
@@ -173,6 +211,10 @@ export default function VenueDetailScreen({ route, navigation }) {
           <AppIcon name="navigation" size={15} color={colors.roast} />
           <Text style={styles.actionLabel}>DIRECTIONS</Text>
         </TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={() => setShareOpen(true)} style={styles.actionButton}>
+          <AppIcon name="share" size={15} color={colors.roast} />
+          <Text style={styles.actionLabel}>SHARE POUR</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.divider} />
       <Text style={styles.sectionLabel}>ABOUT THIS PLACE</Text>
@@ -185,6 +227,7 @@ export default function VenueDetailScreen({ route, navigation }) {
         </View>
       ) : null}
       <View style={styles.divider} />
+      <View onLayout={event => setReviewOffset(event.nativeEvent.layout.y)}>
       <View style={styles.sectionHeading}>
         <View><Text style={styles.sectionLabel}>THE COMMUNITY</Text><Text style={styles.sectionTitle}>Rate this pour</Text></View>
         {myReview ? <Text style={styles.editHint}>YOUR REVIEW · EDITABLE</Text> : null}
@@ -204,6 +247,7 @@ export default function VenueDetailScreen({ route, navigation }) {
       {message ? <Text style={styles.message}>{message}</Text> : null}
       <PrimaryButton title={myReview ? 'UPDATE MY REVIEW' : 'SUBMIT RATING'} onPress={submitReview} loading={saving} />
       {myReview ? <TouchableOpacity onPress={() => confirmDelete(myReview)} style={styles.deleteReview}><Text style={styles.deleteReviewText}>DELETE MY REVIEW</Text></TouchableOpacity> : null}
+      </View>
       <View style={styles.divider} />
       <View style={styles.sectionHeading}>
         <View><Text style={styles.sectionLabel}>RECENT TASTES</Text><Text style={styles.sectionTitle}>What people are saying</Text></View>
@@ -225,6 +269,41 @@ export default function VenueDetailScreen({ route, navigation }) {
         </View>
       )) : <View style={styles.emptyReviews}><AppIcon name="sparkles" size={17} color={colors.gold} /><Text style={styles.emptyTitle}>Be the first to rate this pour</Text><Text style={styles.emptyBody}>Your review helps the next person find their new favorite.</Text></View>}
     </ScrollView>
+    <Modal visible={shareOpen} transparent animationType="fade" onRequestClose={() => setShareOpen(false)}>
+      <View style={styles.shareBackdrop}>
+        <View style={styles.shareSheet}>
+          <View style={styles.shareSheetTop}>
+            <View><Text style={styles.sectionLabel}>GOOD TASTE, SHARED</Text><Text style={styles.shareSheetTitle}>Share this pour</Text></View>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close share preview" onPress={() => setShareOpen(false)} style={styles.shareClose}>
+              <AppIcon name="x" size={17} color={colors.roast} />
+            </TouchableOpacity>
+          </View>
+          <ViewShot ref={shareCardRef} options={{ format: 'png', quality: 1, result: 'tmpfile' }} style={styles.shareCapture}>
+            <View style={styles.shareCard}>
+              <Image source={{ uri: venue.photoUrl || fallbackPhoto }} resizeMode="cover" style={styles.sharePhoto} />
+              <View style={styles.shareCardContent}>
+                <TopTiniLogo light size="normal" />
+                <Text style={styles.shareCardEyebrow}>THE POUR</Text>
+                <Text numberOfLines={2} style={styles.shareCardName}>{venue.name}</Text>
+                <Text numberOfLines={1} style={styles.shareCardPlace}>{venue.city}{venue.state ? ` · ${venue.state}` : ''}</Text>
+                <View style={styles.shareCardScore}>
+                  <AppIcon name="star" size={17} color={colors.gold} />
+                  <Text style={styles.shareCardScoreValue}>{score.reviewCount ? Number(score.averageScore).toFixed(1) : '—'}</Text>
+                  <Text style={styles.shareCardScoreScale}>/ 10</Text>
+                </View>
+                <Text style={styles.shareCardScoreCaption}>TOPTINI COMMUNITY SCORE</Text>
+                <Text style={styles.shareCardFooter}>Find your next favorite pour.</Text>
+              </View>
+            </View>
+          </ViewShot>
+          <TouchableOpacity accessibilityRole="button" onPress={shareVenueCard} style={styles.shareNowButton}>
+            <AppIcon name="share" size={16} color={colors.cream} />
+            <Text style={styles.shareNowText}>SHARE IMAGE</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+    </>
   );
 }
 

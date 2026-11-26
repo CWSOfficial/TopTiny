@@ -466,7 +466,7 @@ function AdminApp() {
       <main className="auth-view">
         <section className="auth-card">
           <BrandLogo tone="dark" className="login-brand-logo" /><p className="eyebrow">PRIVATE ADMIN</p>
-          <h1>Welcome back.</h1>
+          <h1>Admin sign in</h1>
           <p className="muted">Sign in with your TopTini administrator account to manage the guide and community.</p>
           {loginError ? <p className="login-error" role="alert">{loginError}</p> : null}
           <form onSubmit={handleLogin}>

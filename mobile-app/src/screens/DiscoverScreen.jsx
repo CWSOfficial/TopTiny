@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Callout, CalloutSubview, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import AppIcon from '../components/AppIcon';
 import { useApp } from '../context/AppContext';
@@ -49,8 +49,9 @@ export default function DiscoverScreen({ navigation }) {
     return matches.sort((first, second) => distance(first) - distance(second));
   }, [venues, query, userLocation]);
   const meta = cityMeta[city];
-  const openProfile = () => navigation.navigate(profile ? 'Profile' : 'Auth');
-  const onMarker = venue => navigation.navigate('VenueDetail', { venue });
+  const openProfile = () => navigation.navigate(profile ? 'Profile' : 'Login');
+  const onMarker = (venue, focusReview = false) =>
+    navigation.navigate('VenueDetail', { venue, focusReview });
   const findNearby = () => {
     setLocationMessage('');
     Geolocation.getCurrentPosition(
@@ -102,18 +103,30 @@ export default function DiscoverScreen({ navigation }) {
                   latitude: venue.latitude,
                   longitude: venue.longitude,
                 }}
-                title={venue.name}
-                description={
-                  venue.address +
-                  (venue.reviewCount
-                    ? ` · ${Number(venue.averageScore).toFixed(1)} (${venue.reviewCount} ratings)`
-                    : ' · Be the first to rate')
-                }
-                onCalloutPress={() => onMarker(venue)}
               >
                 <View style={styles.mapPin}>
                   <AppIcon name="coffee" size={13} color={colors.cream} />
                 </View>
+                <Callout tooltip onPress={() => onMarker(venue)}>
+                  <View style={styles.mapCallout}>
+                    <Text numberOfLines={1} style={styles.mapCalloutName}>{venue.name}</Text>
+                    <Text numberOfLines={1} style={styles.mapCalloutAddress}>{venue.address}</Text>
+                    <View style={styles.mapCalloutBottom}>
+                      <View style={styles.mapCalloutScore}>
+                        <AppIcon name="star" size={12} color={colors.gold} />
+                        <Text style={styles.mapCalloutScoreText}>
+                          {venue.reviewCount ? Number(venue.averageScore).toFixed(1) : '—'}
+                        </Text>
+                        <Text style={styles.mapCalloutScale}>/10</Text>
+                      </View>
+                      <CalloutSubview onPress={() => onMarker(venue, true)}>
+                        <View style={styles.mapCalloutRate}>
+                          <Text style={styles.mapCalloutRateText}>RATE IT</Text>
+                        </View>
+                      </CalloutSubview>
+                    </View>
+                  </View>
+                </Callout>
               </Marker>
             ))}
           </MapView>
@@ -282,6 +295,7 @@ export default function DiscoverScreen({ navigation }) {
                   key={venue.id}
                   venue={venue}
                   onPress={() => onMarker(venue)}
+                  onRatePress={() => onMarker(venue, true)}
                 />
               ))
             ) : (

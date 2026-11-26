@@ -19,6 +19,8 @@ const flaticonGlyphMap = {
   'map-pin': 0xf8f9,
   navigation: 0xf99d,
   search: 0xfbba,
+  share: 0xfbd5,
+  x: 0xf4f6,
   sliders: 0xf215,
   sparkles: 0xfc84,
   trophy: 0xfe39,

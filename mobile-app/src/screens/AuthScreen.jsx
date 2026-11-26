@@ -191,9 +191,9 @@ export default function AuthScreen({ navigation, route }) {
           <View style={styles.logoWrap}>
             <TopTiniLogo size="large" />
           </View>
-          <Text style={styles.eyebrow}>
-            {mode === 'login' ? 'WELCOME BACK' : 'WELCOME TO THE TABLE'}
-          </Text>
+          {mode === 'register' ? (
+            <Text style={styles.eyebrow}>WELCOME TO THE TABLE</Text>
+          ) : null}
           <Text style={styles.title}>
             {mode === 'login'
               ? 'Your next night\nout starts here.'
