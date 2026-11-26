@@ -104,10 +104,10 @@ export function CitiesPage({ cities, venues, submissions, onAdd, onEdit, onToggl
   );
 }
 
-export function UsersPage({ users, page, hasMore, total, busy, error, onRefresh, onPage, onEdit }) {
+export function UsersPage({ users, page, hasMore, total, busy, error, onRefresh, onPage, onEdit, onGrantAdmin }) {
   return (
     <>
-      <PageTitle title="Know your community." subtitle="View member accounts and update their TopTini profile details.">
+      <PageTitle title="Know your community." subtitle="Manage member profiles and administrator access.">
         <button className="button" onClick={onRefresh} disabled={busy}>{busy ? 'Loading…' : <><Icon name="refresh" /> Refresh users</>}</button>
       </PageTitle>
       {error ? <div className="users-error" role="alert"><strong>User directory unavailable</strong><span>{error}</span><small>Check the <code>admin-users</code> function response and its Supabase project configuration.</small></div> : null}
@@ -121,7 +121,12 @@ export function UsersPage({ users, page, hasMore, total, busy, error, onRefresh,
               <td>{dateText(member.createdAt)}</td>
               <td>{dateText(member.lastSignInAt)}</td>
               <td><StatusPill value={member.isAdmin ? 'admin' : member.hasProfile ? 'member' : 'profile missing'} /></td>
-              <td><button className="table-action" onClick={() => onEdit(member)} disabled={!member.hasProfile}>Edit profile</button></td>
+              <td><div className="table-actions">
+                <button className="table-action" onClick={() => onEdit(member)} disabled={!member.hasProfile}>Edit profile</button>
+                {member.isAdmin
+                  ? <StatusPill value="admin" />
+                  : <button className="table-action" onClick={() => onGrantAdmin(member)}>Grant admin</button>}
+              </div></td>
             </tr>
           )) : <tr><td className="empty-cell" colSpan="6">{busy ? 'Loading accounts…' : 'No user accounts found.'}</td></tr>}</tbody>
         </table></div>

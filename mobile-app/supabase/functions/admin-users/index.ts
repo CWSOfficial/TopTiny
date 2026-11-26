@@ -94,6 +94,75 @@ Deno.serve(async request => {
       return json({ profile });
     }
 
+    if (payload?.action === "grant_admin_role") {
+      const userId = String(payload.userId || "");
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        return json({ error: "Choose a valid user account." }, 400);
+      }
+      if (userId === authData.user.id) return json({ error: "You cannot change your own administrator access." }, 403);
+
+      const { data: targetResult, error: targetError } = await admin.auth.admin.getUserById(userId);
+      if (targetError || !targetResult.user) return json({ error: "This account could not be found." }, 404);
+
+      const { data: existingProfile, error: existingProfileError } = await admin
+        .from("profiles")
+        .select("id,username,preferred_city,avatar_path,is_admin,created_at")
+        .eq("id", userId)
+        .maybeSingle();
+      if (existingProfileError) {
+        console.error("admin-users: target role lookup failed", existingProfileError.message);
+        return json({ error: "The account's current access could not be checked." }, 500);
+      }
+      if (existingProfile?.is_admin === true) return json({ profile: existingProfile, alreadyAdmin: true });
+
+      let profile = existingProfile;
+      if (existingProfile) {
+        const { data, error: roleError } = await admin
+          .from("profiles")
+          .update({ is_admin: true })
+          .eq("id", userId)
+          .select("id,username,preferred_city,avatar_path,is_admin,created_at")
+          .maybeSingle();
+        if (roleError) {
+          console.error("admin-users: role grant failed", roleError.message);
+          return json({ error: "Administrator access could not be granted." }, 500);
+        }
+        profile = data;
+      } else {
+        const requestedCity = String(payload.preferredCity || targetResult.user.user_metadata?.preferred_city || "").trim();
+        const { data: city, error: cityError } = await admin
+          .from("cities")
+          .select("name")
+          .eq("is_active", true)
+          .eq("name", requestedCity || "Milwaukee")
+          .maybeSingle();
+        if (cityError) {
+          console.error("admin-users: profile city lookup failed", cityError.message);
+          return json({ error: "A default city could not be selected for this account." }, 500);
+        }
+        const { data: fallbackCities, error: fallbackCityError } = city
+          ? { data: [city], error: null }
+          : await admin.from("cities").select("name").eq("is_active", true).order("name").limit(1);
+        if (fallbackCityError || !fallbackCities?.[0]) return json({ error: "Add an active city before granting admin access." }, 409);
+
+        const emailName = (targetResult.user.email || "").split("@")[0];
+        const suppliedName = String(payload.username || targetResult.user.user_metadata?.username || emailName || "").trim().slice(0, 30);
+        const username = suppliedName.length >= 2 ? suppliedName : "TopTini member";
+        const { data, error: insertError } = await admin
+          .from("profiles")
+          .insert({ id: userId, username, preferred_city: fallbackCities[0].name, is_admin: true })
+          .select("id,username,preferred_city,avatar_path,is_admin,created_at")
+          .single();
+        if (insertError) {
+          console.error("admin-users: profile creation for admin grant failed", insertError.message);
+          return json({ error: "A TopTini profile could not be created for this account." }, 500);
+        }
+        profile = data;
+      }
+      if (!profile) return json({ error: "Administrator access could not be confirmed." }, 500);
+      return json({ profile, alreadyAdmin: false });
+    }
+
     if (payload?.action !== "list") return json({ error: "Choose a supported user-management action." }, 400);
     const page = Math.max(1, Math.floor(Number(payload.page) || 1));
     const perPage = Math.min(100, Math.max(10, Math.floor(Number(payload.perPage) || 50)));

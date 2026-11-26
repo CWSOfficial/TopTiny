@@ -49,6 +49,8 @@ function AdminApp() {
   const [userModal, setUserModal] = useState(null);
   const [userForm, setUserForm] = useState({ username: '', preferredCity: '' });
   const [userSaving, setUserSaving] = useState(false);
+  const [adminGrantModal, setAdminGrantModal] = useState(null);
+  const [adminGrantSaving, setAdminGrantSaving] = useState(false);
   const [data, setData] = useState(emptyData);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
@@ -199,6 +201,21 @@ function AdminApp() {
       preferredCity: member.preferredCity || data.cities.find(city => city.is_active)?.name || '',
     });
     setUserModal(member);
+  }
+
+  async function grantAdminAccess() {
+    if (!adminGrantModal) return;
+    setAdminGrantSaving(true);
+    const { data: result, error } = await supabase.functions.invoke('admin-users', {
+      body: { action: 'grant_admin_role', userId: adminGrantModal.id },
+    });
+    setAdminGrantSaving(false);
+    if (error || result?.error) return notify(result?.error || error?.message || 'Administrator access could not be granted.', true);
+    setUsers(current => current.map(member => member.id === adminGrantModal.id
+      ? { ...member, isAdmin: true, hasProfile: true, username: result.profile.username, preferredCity: result.profile.preferred_city }
+      : member));
+    setAdminGrantModal(null);
+    notify(result.alreadyAdmin ? 'This account already has admin access.' : 'Administrator access granted.');
   }
 
   async function saveUser(event) {
@@ -488,7 +505,7 @@ function AdminApp() {
 
   const pageContent = {
     overview: <OverviewPage user={user} {...data} onNavigate={selectPage} onAddVenue={() => openVenue()} />,
-    users: <UsersPage users={users} page={usersPage} hasMore={usersHasMore} total={usersTotal} busy={usersBusy} error={usersError} onRefresh={() => loadUsers(usersPage)} onPage={loadUsers} onEdit={openUser} />,
+    users: <UsersPage users={users} page={usersPage} hasMore={usersHasMore} total={usersTotal} busy={usersBusy} error={usersError} onRefresh={() => loadUsers(usersPage)} onPage={loadUsers} onEdit={openUser} onGrantAdmin={setAdminGrantModal} />,
     venues: <VenuesPage venues={data.venues} cities={data.cities} onAdd={() => openVenue()} onEdit={openVenue} onDelete={deleteVenue} onImport={() => csvInput.current?.click()} />,
     cities: <CitiesPage cities={data.cities} venues={data.venues} submissions={data.submissions} onAdd={() => openCity()} onEdit={openCity} onToggle={toggleCity} onDelete={deleteCity} />,
     submissions: <SubmissionsPage submissions={data.submissions} cities={data.cities} onApprove={approveSubmission} onReject={rejectSubmission} />,
@@ -524,6 +541,7 @@ function AdminApp() {
       {venueModal ? <VenueDialog form={venueForm} cities={data.cities} photoFile={photoFile} onChange={updateVenueField} onPhoto={event => setPhotoFile(event.target.files?.[0] || null)} onClose={() => setVenueModal(null)} onSubmit={saveVenue} /> : null}
       {cityModal ? <CityDialog form={cityForm} setForm={setCityForm} onClose={() => setCityModal(false)} onSubmit={saveCity} /> : null}
       {userModal ? <UserDialog member={userModal} form={userForm} setForm={setUserForm} cities={data.cities} onClose={() => setUserModal(null)} onSubmit={saveUser} busy={userSaving} /> : null}
+      {adminGrantModal ? <GrantAdminDialog member={adminGrantModal} onClose={() => setAdminGrantModal(null)} onConfirm={grantAdminAccess} busy={adminGrantSaving} /> : null}
     </>
   );
 }
@@ -593,6 +611,29 @@ function UserDialog({ member, form, setForm, cities, onClose, onSubmit, busy: sa
         <p className="form-help">Email and administrator access are read-only here. This editor changes only the member’s TopTini username and home city.</p>
         <div className="dialog-actions"><button type="button" className="button quiet" onClick={onClose} disabled={saving}>Cancel</button><button className="button primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save profile'}</button></div>
       </form>
+    </Modal>
+  );
+}
+
+function GrantAdminDialog({ member, onClose, onConfirm, busy }) {
+  return (
+    <Modal title="Grant admin access" eyebrow="ACCOUNT PERMISSIONS" onClose={onClose}>
+      <div className="modal-form">
+        <div className="form-grid">
+          <label className="span-2">Account email<input value={member.email} readOnly /></label>
+          <label className="span-2">Current access<input value={member.isAdmin ? 'Administrator' : member.hasProfile ? 'Member' : 'Member · profile not set up'} readOnly /></label>
+        </div>
+        <div className="admin-access-note">
+          <strong>This gives the account access to the admin panel.</strong>
+          <span>Administrators can manage members, venues, city guides, ratings, and reports. Grant access only to someone you trust.</span>
+        </div>
+        <div className="dialog-actions">
+          <button type="button" className="button quiet" onClick={onClose} disabled={busy}>Cancel</button>
+          <button type="button" className="button primary" onClick={onConfirm} disabled={busy || member.isAdmin}>
+            {busy ? 'Granting access…' : member.isAdmin ? 'Already an admin' : 'Grant admin access'}
+          </button>
+        </div>
+      </div>
     </Modal>
   );
 }
